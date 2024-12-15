@@ -49,10 +49,12 @@ func (b *tokenBucket) tryInitialize(key string) {
 }
 
 func (b *tokenBucket) replenish(key string) {
-	sinceLastReplenishment := b.timeProvider().Sub(b.lastReplenishedAt[key])
+	lastReplenishedAt := b.lastReplenishedAt[key]
+	sinceLastReplenishment := b.timeProvider().Sub(lastReplenishedAt)
 	replenishedTokenCount := b.replenishCount * int(sinceLastReplenishment/b.replenishInterval)
 	currentTokenCount := b.tokenStore[key]
 	b.tokenStore[key] = min(currentTokenCount+replenishedTokenCount, b.tokenCapacity)
+	b.lastReplenishedAt[key] = lastReplenishedAt.Add(b.replenishInterval * (sinceLastReplenishment / b.replenishInterval))
 }
 
 func (b *tokenBucket) tryDecrementToken(key string) bool {

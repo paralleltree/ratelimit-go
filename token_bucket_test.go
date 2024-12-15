@@ -40,4 +40,9 @@ func TestTokenBucket(t *testing.T) {
 	setTime(initTime.Add(10 * time.Second))
 	// 補充され通る
 	assert.True(t, limiter.Consume(key))
+	assert.True(t, limiter.Consume(key))
+	assert.True(t, limiter.Consume(key))
+
+	// トークンを使いきったので通らない
+	assert.False(t, limiter.Consume(key))
 }
